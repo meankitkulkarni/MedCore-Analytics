@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MedCore Analytics — Hospital Intelligence Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #080c14;
+            --surface: #0d1422;
+            --surface2: #111827;
+            --surface3: #1a2236;
+            --border: rgba(99, 179, 237, 0.12);
+            --accent: #3b9edd;
+            --accent2: #22d3a5;
+            --accent3: #f97316;
+            --accent4: #a78bfa;
+            --accent5: #fb7185;
+            --text: #e8edf5;
+            --text2: #8fa3bf;
+            --text3: #4a6080;
+            --critical: #fb7185;
+            --high: #f97316;
+            --medium: #fbbf24;
+            --low: #22d3a5;
+            --grid: rgba(99, 179, 237, 0.04);
+            --shadow: 0 4px 32px rgba(0, 0, 0, 0.5);
+            --shadow-hover: 0 8px 48px rgba(59, 158, 221, 0.18);
+            --radius: 14px;
+            --radius-sm: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ─── Background Grid ─── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                linear-gradient(rgba(59, 158, 221, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 158, 221, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: -30vh;
+            right: -20vw;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(59, 158, 221, 0.07) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ─── Top Bar ─── */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            height: 64px;
+            background: rgba(8, 12, 20, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 34px;
+            height: 34px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .logo-text {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.2rem;
+            letter-spacing: 0.02em;
+        }
+
+        .logo-sub {
+            font-size: 0.72rem;
+            color: var(--text3);
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-left: 2px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent2);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent2);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.6;
+                transform: scale(1.3);
+            }
+        }
+
+        .live-badge {
+            font-size: 0.72rem;
+            color: var(--accent2);
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .timestamp {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            color: var(--text3);
+            padding: 4px 12px;
+            background: var(--surface2);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+
+        /* ─── Import/Actions Bar ─── */
+        .actions-bar {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 32px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .actions-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            border-radius: var(--radius-sm);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #2b8abf);
+            color: #fff;
+            box-shadow: 0 2px 12px rgba(59, 158, 221, 0.35);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(59, 158, 221, 0.5);
+        }
+
+        .btn-danger {
+            background: rgba(251, 113, 133, 0.12);
+            color: var(--critical);
+            border: 1px solid rgba(251, 113, 133, 0.25);
+        }
+
+        .btn-danger:hover {
+            background: rgba(251, 113, 133, 0.2);
+            border-color: rgba(251, 113, 133, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--surface2);
+            color: var(--text2);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--surface3);
+            color: var(--text);
+            border-color: rgba(99, 179, 237, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text2);
+            border: 1px solid transparent;
+        }
+
+        .btn-ghost:hover {
+            background: var(--surface2);
+            border-color: var(--border);
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .record-count {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text3);
+            padding: 8px 14px;
+            background: var(--surface2);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+
+        .record-count span {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* ─── Search/Filter ─── */
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            padding: 9px 12px 9px 36px;
+            border-radius: var(--radius-sm);
+            outline: none;
+            width: 220px;
+            transition: border-color 0.2s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--accent);
+        }
+
+        .search-box input::placeholder {
+            color: var(--text3);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text3);
+            font-size: 14px;
+        }
+
+        select.filter-select {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text2);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            padding: 9px 12px;
+            border-radius: var(--radius-sm);
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        select.filter-select:focus {
+            border-color: var(--accent);
+        }
+
+        /* ─── Toast ─── */
+        .toast {
+            position: fixed;
+            top: 80px;
+            right: 24px;
+            z-index: 999;
+            padding: 14px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 0.88rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(120%);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-width: 320px;
+            box-shadow: var(--shadow);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast-success {
+            background: #0d2218;
+            border: 1px solid rgba(34, 211, 165, 0.3);
+            color: var(--accent2);
+        }
+
+        .toast-error {
+            background: #200d12;
+            border: 1px solid rgba(251, 113, 133, 0.3);
+            color: var(--critical);
+        }
+
+        .toast-info {
+            background: #0d1828;
+            border: 1px solid rgba(59, 158, 221, 0.3);
+            color: var(--accent);
+        }
+
+        /* ─── Main Layout ─── */
+        .main {
+            position: relative;
+            z-index: 1;
+            padding: 24px 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ─── KPI Cards ─── */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .kpi-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px 24px;
+            position: relative;
+            overflow: hidden;
+            cursor: default;
+            transition: all 0.3s ease;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--card-color, var(--accent));
+            opacity: 0.8;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(99, 179, 237, 0.3);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .kpi-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text3);
+            margin-bottom: 10px;
+        }
+
+        .kpi-value {
+            font-family: 'DM Serif Display', serif;
+            font-size: 2.2rem;
+            line-height: 1;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        .kpi-sub {
+            font-size: 0.8rem;
+            color: var(--text3);
+        }
+
+        .kpi-icon {
+            position: absolute;
+            right: 20px;
+            top: 18px;
+            font-size: 1.8rem;
+            opacity: 0.15;
+        }
+
+        .kpi-trend {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .trend-up {
+            color: var(--accent2);
+        }
+
+        .trend-down {
+            color: var(--critical);
+        }
+
+        /* ─── Charts Grid ─── */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .charts-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        .chart-full {
+            grid-column: 1/-1;
+        }
+
+        .chart-span2 {
+            grid-column: span 2;
+        }
+
+        .chart-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px 24px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-card:hover {
+            border-color: rgba(99, 179, 237, 0.22);
+            box-shadow: 0 4px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .chart-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at top right, rgba(59, 158, 221, 0.04) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        .chart-title {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: 0.01em;
+        }
+
+        .chart-subtitle {
+            font-size: 0.75rem;
+            color: var(--text3);
+            margin-top: 2px;
+        }
+
+        .chart-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .badge-blue {
+            background: rgba(59, 158, 221, 0.12);
+            color: var(--accent);
+            border: 1px solid rgba(59, 158, 221, 0.2);
+        }
+
+        .badge-green {
+            background: rgba(34, 211, 165, 0.12);
+            color: var(--accent2);
+            border: 1px solid rgba(34, 211, 165, 0.2);
+        }
+
+        .badge-orange {
+            background: rgba(249, 115, 22, 0.12);
+            color: var(--accent3);
+            border: 1px solid rgba(249, 115, 22, 0.2);
+        }
+
+        .badge-purple {
+            background: rgba(167, 139, 250, 0.12);
+            color: var(--accent4);
+            border: 1px solid rgba(167, 139, 250, 0.2);
+        }
+
+        .badge-red {
+            background: rgba(251, 113, 133, 0.12);
+            color: var(--accent5);
+            border: 1px solid rgba(251, 113, 133, 0.2);
+        }
+
+        .chart-wrap {
+            position: relative;
+            height: 240px;
+        }
+
+        .chart-wrap-sm {
+            height: 200px;
+        }
+
+        .chart-wrap-lg {
+            height: 300px;
+        }
+
+        /* ─── Table ─── */
+        .table-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .table-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-title {
+            font-size: 0.88rem;
+            font-weight: 600;
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            padding: 12px 16px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text3);
+            text-align: left;
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.2s;
+        }
+
+        thead th:hover {
+            color: var(--accent);
+        }
+
+        tbody tr {
+            border-bottom: 1px solid rgba(99, 179, 237, 0.06);
+            transition: background 0.15s;
+            cursor: default;
+        }
+
+        tbody tr:hover {
+            background: rgba(59, 158, 221, 0.05);
+        }
+
+        tbody td {
+            padding: 12px 16px;
+            font-size: 0.84rem;
+            color: var(--text2);
+            white-space: nowrap;
+        }
+
+        .patient-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .patient-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            color: #fff;
+        }
+
+        .patient-name {
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .patient-id {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            color: var(--text3);
+        }
+
+        .severity-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+
+        .sev-critical {
+            background: rgba(251, 113, 133, 0.12);
+            color: var(--critical);
+            border: 1px solid rgba(251, 113, 133, 0.2);
+        }
+
+        .sev-high {
+            background: rgba(249, 115, 22, 0.12);
+            color: var(--accent3);
+            border: 1px solid rgba(249, 115, 22, 0.2);
+        }
+
+        .sev-medium {
+            background: rgba(251, 191, 36, 0.12);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.2);
+        }
+
+        .sev-low {
+            background: rgba(34, 211, 165, 0.12);
+            color: var(--accent2);
+            border: 1px solid rgba(34, 211, 165, 0.2);
+        }
+
+        .status-active {
+            color: var(--accent2);
+        }
+
+        .status-discharged {
+            color: var(--text3);
+        }
+
+        .cost-cell {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            color: var(--text);
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text3);
+            padding: 5px 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .delete-btn:hover {
+            background: rgba(251, 113, 133, 0.12);
+            color: var(--critical);
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .page-info {
+            font-size: 0.8rem;
+            color: var(--text3);
+        }
+
+        .page-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .page-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--surface2);
+            color: var(--text2);
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-btn:hover,
+        .page-btn.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        /* ─── Divider / Section Header ─── */
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text3);
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* ─── Empty State ─── */
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+            color: var(--text3);
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.4;
+        }
+
+        .empty-title {
+            font-size: 1.1rem;
+            color: var(--text2);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .empty-sub {
+            font-size: 0.88rem;
+        }
+
+        /* ─── Tooltip ─── */
+        [data-tip] {
+            position: relative;
+        }
+
+        [data-tip]:hover::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: calc(100% + 6px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--surface3);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 0.75rem;
+            padding: 5px 10px;
+            border-radius: 6px;
+            white-space: nowrap;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 1100px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-grid-3 {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .chart-span2 {
+                grid-column: 1/-1;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .main {
+                padding: 16px;
+            }
+
+            .topbar {
+                padding: 0 16px;
+            }
+
+            .actions-bar {
+                padding: 12px 16px;
+            }
+
+            .charts-grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* ─── Loading Animation ─── */
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, var(--surface2) 25%, var(--surface3) 50%, var(--surface2) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 6px;
+        }
+
+        /* ─── Scrollbar ─── */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--surface3);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text3);
+        }
+
+        /* Fade-in animation for dashboard */
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-in {
+            animation: fadeSlideUp 0.4s ease forwards;
+        }
+
+        .animate-in-delay-1 {
+            animation-delay: 0.05s;
+            opacity: 0;
+        }
+
+        .animate-in-delay-2 {
+            animation-delay: 0.1s;
+            opacity: 0;
+        }
+
+        .animate-in-delay-3 {
+            animation-delay: 0.15s;
+            opacity: 0;
+        }
+
+        .animate-in-delay-4 {
+            animation-delay: 0.2s;
+            opacity: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Top Bar -->
+    <header class="topbar">
+        <div class="logo">
+            <div class="logo-icon">🏥</div>
+            <div>
+                <div class="logo-text">MedCore Analytics</div>
+                <div class="logo-sub">Hospital Intelligence Platform</div>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <div class="status-dot"></div>
+            <div class="live-badge">Live</div>
+            <div class="timestamp" id="clock">--:--:--</div>
+        </div>
+    </header>
+
+    <!-- Actions Bar -->
+    <div class="actions-bar">
+        <div class="actions-left">
+            <label class="btn btn-primary" for="fileInput" data-tip="Import JSON hospital records">
+                ⬆ Import JSON
+            </label>
+            <input type="file" id="fileInput" accept=".json" />
+
+            <button class="btn btn-secondary" onclick="loadSampleData()" data-tip="Load built-in demo data">
+                📋 Load Demo Data
+            </button>
+
+            <button class="btn btn-danger" onclick="clearAllData()" id="clearBtn" disabled>
+                🗑 Clear All
+            </button>
+
+            <button class="btn btn-ghost" onclick="exportFiltered()" id="exportBtn" disabled
+                data-tip="Export filtered data">
+                ⬇ Export
+            </button>
+        </div>
+
+        <div class="filter-group">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Search patients…" oninput="filterTable()" />
+            </div>
+            <select class="filter-select" id="deptFilter" onchange="filterTable()">
+                <option value="">All Departments</option>
+            </select>
+            <select class="filter-select" id="sevFilter" onchange="filterTable()">
+                <option value="">All Severities</option>
+                <option value="Critical">Critical</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+            </select>
+            <div class="record-count">Showing <span id="showCount">0</span> of <span id="totalCount">0</span></div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main" id="main">
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState">
+            <div class="empty-icon">📊</div>
+            <div class="empty-title">No Data Loaded</div>
+            <div class="empty-sub">Import a JSON file or load demo data to begin analysis</div>
+        </div>
+
+        <!-- Dashboard (hidden until data loaded) -->
+        <div id="dashboard" style="display:none">
+
+            <!-- KPI Cards -->
+            <div class="kpi-grid animate-in" id="kpiGrid"></div>
+
+            <!-- Row 1: 2 col charts -->
+            <div class="section-title animate-in animate-in-delay-1">Patient Analytics</div>
+            <div class="charts-grid animate-in animate-in-delay-1">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Admissions by Department</div>
+                            <div class="chart-subtitle">Patient distribution across units</div>
+                        </div>
+                        <span class="chart-badge badge-blue">Bar Chart</span>
+                    </div>
+                    <div class="chart-wrap"><canvas id="deptChart"></canvas></div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Severity Distribution</div>
+                            <div class="chart-subtitle">Triage classification breakdown</div>
+                        </div>
+                        <span class="chart-badge badge-red">Donut</span>
+                    </div>
+                    <div class="chart-wrap"><canvas id="sevChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Row 2: 3 col charts -->
+            <div class="section-title animate-in animate-in-delay-2">Financial & Clinical Metrics</div>
+            <div class="charts-grid-3 animate-in animate-in-delay-2">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Cost vs Coverage</div>
+                            <div class="chart-subtitle">Treatment cost & insurance</div>
+                        </div>
+                        <span class="chart-badge badge-green">Stacked Bar</span>
+                    </div>
+                    <div class="chart-wrap chart-wrap-sm"><canvas id="costChart"></canvas></div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Gender Distribution</div>
+                            <div class="chart-subtitle">Patient gender breakdown</div>
+                        </div>
+                        <span class="chart-badge badge-purple">Pie Chart</span>
+                    </div>
+                    <div class="chart-wrap chart-wrap-sm"><canvas id="genderChart"></canvas></div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Room Type Usage</div>
+                            <div class="chart-subtitle">Bed allocation by type</div>
+                        </div>
+                        <span class="chart-badge badge-orange">Doughnut</span>
+                    </div>
+                    <div class="chart-wrap chart-wrap-sm"><canvas id="roomChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Row 3: Full width -->
+            <div class="section-title animate-in animate-in-delay-3">Trend & Distribution Analysis</div>
+            <div class="charts-grid animate-in animate-in-delay-3">
+                <div class="chart-card chart-full">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Monthly Admissions Trend</div>
+                            <div class="chart-subtitle">Patient intake over time by severity</div>
+                        </div>
+                        <span class="chart-badge badge-blue">Multi-Line</span>
+                    </div>
+                    <div class="chart-wrap chart-wrap-lg"><canvas id="trendChart"></canvas></div>
+                </div>
+            </div>
+
+            <div class="charts-grid animate-in animate-in-delay-3">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Age Distribution Histogram</div>
+                            <div class="chart-subtitle">Patient age bucket spread</div>
+                        </div>
+                        <span class="chart-badge badge-orange">Histogram</span>
+                    </div>
+                    <div class="chart-wrap"><canvas id="ageHistChart"></canvas></div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Length of Stay by Department</div>
+                            <div class="chart-subtitle">Average days per admission unit</div>
+                        </div>
+                        <span class="chart-badge badge-purple">Horizontal Bar</span>
+                    </div>
+                    <div class="chart-wrap"><canvas id="losChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Row 4: Scatter + Radar -->
+            <div class="charts-grid animate-in animate-in-delay-4">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Cost vs Length of Stay</div>
+                            <div class="chart-subtitle">Correlation scatter plot</div>
+                        </div>
+                        <span class="chart-badge badge-green">Scatter</span>
+                    </div>
+                    <div class="chart-wrap"><canvas id="scatterChart"></canvas></div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Readmission by Department</div>
+                            <div class="chart-subtitle">Readmission rate radar</div>
+                        </div>
+                        <span class="chart-badge badge-red">Radar</span>
+                    </div>
+                    <div class="chart-wrap"><canvas id="radarChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Patient Records Table -->
+            <div class="section-title animate-in animate-in-delay-4">Patient Records</div>
+            <div class="table-card animate-in animate-in-delay-4">
+                <div class="table-header">
+                    <div>
+                        <div class="chart-title">Detailed Patient Registry</div>
+                        <div class="chart-subtitle">Full record management with delete capability</div>
+                    </div>
+                    <span class="chart-badge badge-blue" id="tableCountBadge">0 Records</span>
+                </div>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable('id')">ID ↕</th>
+                                <th onclick="sortTable('name')">Patient ↕</th>
+                                <th onclick="sortTable('age')">Age ↕</th>
+                                <th onclick="sortTable('department')">Department ↕</th>
+                                <th onclick="sortTable('diagnosis')">Diagnosis</th>
+                                <th onclick="sortTable('severity')">Severity ↕</th>
+                                <th onclick="sortTable('status')">Status ↕</th>
+                                <th onclick="sortTable('lengthOfStay')">LOS ↕</th>
+                                <th onclick="sortTable('treatmentCost')">Cost ↕</th>
+                                <th onclick="sortTable('doctor')">Doctor ↕</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+                <div class="pagination">
+                    <div class="page-info" id="pageInfo">Page 1 of 1</div>
+                    <div class="page-btns" id="pageBtns"></div>
+                </div>
+            </div>
+
+        </div><!-- /dashboard -->
+    </main>
+
+    <script>
+        // ─────────────────────────────────────────────
+        //  STATE
+        // ─────────────────────────────────────────────
+        let allData = [];
+        let filteredData = [];
+        let charts = {};
+        let currentPage = 1;
+        const PAGE_SIZE = 8;
+        let sortKey = '';
+        let sortAsc = true;
+
+        // ─────────────────────────────────────────────
+        //  CLOCK
+        // ─────────────────────────────────────────────
+        function updateClock() {
+            document.getElementById('clock').textContent = new Date().toLocaleTimeString();
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // ─────────────────────────────────────────────
+        //  TOAST
+        // ─────────────────────────────────────────────
+        let toastTimer;
+        function showToast(msg, type = 'info') {
+            const t = document.getElementById('toast');
+            t.className = `toast toast-${type}`;
+            const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+            t.innerHTML = `${icons[type]} ${msg}`;
+            t.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+        }
+
+        // ─────────────────────────────────────────────
+        //  FILE IMPORT
+        // ─────────────────────────────────────────────
+        document.getElementById('fileInput').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (ev) {
+                try {
+                    const parsed = JSON.parse(ev.target.result);
+                    let records = [];
+                    if (Array.isArray(parsed)) records = parsed;
+                    else if (parsed.records) records = parsed.records;
+                    else if (parsed.patients) records = parsed.patients;
+                    else {
+                        showToast('JSON structure not recognized. Needs "records" array.', 'error');
+                        return;
+                    }
+                    allData = records;
+                    filteredData = [...allData];
+                    showToast(`✅ Imported ${records.length} records from ${file.name}`, 'success');
+                    renderDashboard();
+                } catch (err) {
+                    showToast('Invalid JSON file. ' + err.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+            this.value = '';
+        });
+
+        // ─────────────────────────────────────────────
+        //  SAMPLE DATA (embedded minimal)
+        // ─────────────────────────────────────────────
+        const SAMPLE = [
+            { id: 'P-001', name: 'James Thornton', age: 54, gender: 'Male', bloodType: 'A+', department: 'Cardiology', admissionDate: '2024-01-05', dischargeDate: '2024-01-12', diagnosis: 'Acute Myocardial Infarction', severity: 'Critical', status: 'Discharged', doctor: 'Dr. Sarah Chen', treatmentCost: 24500, insuranceCovered: 20000, roomType: 'ICU', readmission: false, lengthOfStay: 7 },
+            { id: 'P-002', name: 'Maria Gonzalez', age: 34, gender: 'Female', bloodType: 'O-', department: 'Obstetrics', admissionDate: '2024-01-08', dischargeDate: '2024-01-11', diagnosis: 'Normal Delivery', severity: 'Low', status: 'Discharged', doctor: 'Dr. Emily Watkins', treatmentCost: 7800, insuranceCovered: 7000, roomType: 'Standard', readmission: false, lengthOfStay: 3 },
+            { id: 'P-003', name: 'Robert Kim', age: 67, gender: 'Male', bloodType: 'B+', department: 'Neurology', admissionDate: '2024-01-10', dischargeDate: '2024-01-22', diagnosis: 'Ischemic Stroke', severity: 'High', status: 'Discharged', doctor: 'Dr. Michael Park', treatmentCost: 38200, insuranceCovered: 32000, roomType: 'ICU', readmission: true, lengthOfStay: 12 },
+            { id: 'P-004', name: 'Linda Foster', age: 45, gender: 'Female', bloodType: 'AB+', department: 'Oncology', admissionDate: '2024-01-14', dischargeDate: '2024-01-28', diagnosis: 'Breast Cancer Stage II', severity: 'High', status: 'Discharged', doctor: 'Dr. Julia Roberts', treatmentCost: 52000, insuranceCovered: 45000, roomType: 'Private', readmission: false, lengthOfStay: 14 },
+            { id: 'P-005', name: 'Charles Whitfield', age: 72, gender: 'Male', bloodType: 'A-', department: 'Orthopedics', admissionDate: '2024-01-16', dischargeDate: '2024-01-23', diagnosis: 'Hip Fracture', severity: 'Medium', status: 'Discharged', doctor: 'Dr. Alan Turner', treatmentCost: 29800, insuranceCovered: 25000, roomType: 'Semi-Private', readmission: false, lengthOfStay: 7 },
+            { id: 'P-006', name: 'Priya Sharma', age: 29, gender: 'Female', bloodType: 'O+', department: 'Emergency', admissionDate: '2024-01-18', dischargeDate: '2024-01-20', diagnosis: 'Appendicitis', severity: 'Medium', status: 'Discharged', doctor: 'Dr. Kevin Nguyen', treatmentCost: 12500, insuranceCovered: 11000, roomType: 'Standard', readmission: false, lengthOfStay: 2 },
+            { id: 'P-007', name: 'David Okonkwo', age: 38, gender: 'Male', bloodType: 'B-', department: 'Pulmonology', admissionDate: '2024-02-02', dischargeDate: '2024-02-09', diagnosis: 'Severe Pneumonia', severity: 'High', status: 'Discharged', doctor: 'Dr. Sarah Chen', treatmentCost: 18900, insuranceCovered: 16000, roomType: 'Semi-Private', readmission: false, lengthOfStay: 7 },
+            { id: 'P-008', name: 'Susan McCarthy', age: 61, gender: 'Female', bloodType: 'AB-', department: 'Endocrinology', admissionDate: '2024-02-05', dischargeDate: '2024-02-10', diagnosis: 'Diabetic Ketoacidosis', severity: 'Critical', status: 'Discharged', doctor: 'Dr. Aisha Patel', treatmentCost: 22100, insuranceCovered: 19000, roomType: 'ICU', readmission: true, lengthOfStay: 5 },
+            { id: 'P-009', name: 'Thomas Andersen', age: 50, gender: 'Male', bloodType: 'A+', department: 'Gastroenterology', admissionDate: '2024-02-12', dischargeDate: '2024-02-17', diagnosis: 'Acute Pancreatitis', severity: 'Medium', status: 'Discharged', doctor: 'Dr. Michael Park', treatmentCost: 16700, insuranceCovered: 14000, roomType: 'Standard', readmission: false, lengthOfStay: 5 },
+            { id: 'P-010', name: 'Angela Harrison', age: 42, gender: 'Female', bloodType: 'O+', department: 'Psychiatry', admissionDate: '2024-02-14', dischargeDate: '2024-02-28', diagnosis: 'Severe Depression', severity: 'High', status: 'Discharged', doctor: 'Dr. Julia Roberts', treatmentCost: 14800, insuranceCovered: 12000, roomType: 'Private', readmission: false, lengthOfStay: 14 },
+            { id: 'P-011', name: 'Carlos Rivera', age: 58, gender: 'Male', bloodType: 'B+', department: 'Nephrology', admissionDate: '2024-02-20', dischargeDate: '2024-03-05', diagnosis: 'Chronic Kidney Disease', severity: 'High', status: 'Discharged', doctor: 'Dr. Alan Turner', treatmentCost: 41600, insuranceCovered: 38000, roomType: 'Semi-Private', readmission: true, lengthOfStay: 13 },
+            { id: 'P-012', name: 'Natalie Brooks', age: 26, gender: 'Female', bloodType: 'A-', department: 'Dermatology', admissionDate: '2024-03-01', dischargeDate: '2024-03-04', diagnosis: 'Stevens-Johnson Syndrome', severity: 'Critical', status: 'Discharged', doctor: 'Dr. Kevin Nguyen', treatmentCost: 19300, insuranceCovered: 17000, roomType: 'ICU', readmission: false, lengthOfStay: 3 },
+            { id: 'P-013', name: 'Henry Mitchell', age: 79, gender: 'Male', bloodType: 'O-', department: 'Cardiology', admissionDate: '2024-03-08', dischargeDate: '2024-03-20', diagnosis: 'Congestive Heart Failure', severity: 'Critical', status: 'Discharged', doctor: 'Dr. Sarah Chen', treatmentCost: 48700, insuranceCovered: 42000, roomType: 'ICU', readmission: true, lengthOfStay: 12 },
+            { id: 'P-014', name: 'Fatima Al-Rashid', age: 33, gender: 'Female', bloodType: 'AB+', department: 'Rheumatology', admissionDate: '2024-03-12', dischargeDate: '2024-03-18', diagnosis: 'Lupus Erythematosus Flare', severity: 'Medium', status: 'Discharged', doctor: 'Dr. Aisha Patel', treatmentCost: 15600, insuranceCovered: 13000, roomType: 'Standard', readmission: false, lengthOfStay: 6 },
+            { id: 'P-015', name: 'George Patterson', age: 65, gender: 'Male', bloodType: 'B+', department: 'Urology', admissionDate: '2024-03-22', dischargeDate: '2024-03-26', diagnosis: 'Prostate Cancer Surgery', severity: 'Medium', status: 'Discharged', doctor: 'Dr. Emily Watkins', treatmentCost: 32400, insuranceCovered: 28000, roomType: 'Private', readmission: false, lengthOfStay: 4 },
+            { id: 'P-016', name: 'Elena Petrov', age: 48, gender: 'Female', bloodType: 'A+', department: 'Neurology', admissionDate: '2024-04-01', dischargeDate: '2024-04-08', diagnosis: 'Multiple Sclerosis Relapse', severity: 'Medium', status: 'Discharged', doctor: 'Dr. Michael Park', treatmentCost: 21800, insuranceCovered: 19500, roomType: 'Standard', readmission: false, lengthOfStay: 7 },
+            { id: 'P-017', name: 'Omar Khalil', age: 43, gender: 'Male', bloodType: 'O+', department: 'Cardiology', admissionDate: '2024-04-05', dischargeDate: '2024-04-11', diagnosis: 'Cardiac Arrhythmia', severity: 'Medium', status: 'Discharged', doctor: 'Dr. Sarah Chen', treatmentCost: 27300, insuranceCovered: 24000, roomType: 'Semi-Private', readmission: false, lengthOfStay: 6 },
+            { id: 'P-018', name: 'Dorothy Chang', age: 71, gender: 'Female', bloodType: 'AB-', department: 'Oncology', admissionDate: '2024-04-10', dischargeDate: '2024-04-24', diagnosis: 'Non-Hodgkin Lymphoma', severity: 'High', status: 'Active', doctor: 'Dr. Julia Roberts', treatmentCost: 64200, insuranceCovered: 58000, roomType: 'Private', readmission: false, lengthOfStay: 14 },
+            { id: 'P-019', name: 'Marcus Johnson', age: 22, gender: 'Male', bloodType: 'B-', department: 'Emergency', admissionDate: '2024-04-15', dischargeDate: '2024-04-17', diagnosis: 'Traumatic Brain Injury', severity: 'Medium', status: 'Discharged', doctor: 'Dr. Kevin Nguyen', treatmentCost: 8900, insuranceCovered: 8000, roomType: 'Standard', readmission: false, lengthOfStay: 2 },
+            { id: 'P-020', name: 'Isabella Romano', age: 37, gender: 'Female', bloodType: 'A+', department: 'Pulmonology', admissionDate: '2024-04-20', dischargeDate: '2024-04-28', diagnosis: 'Pulmonary Embolism', severity: 'Critical', status: 'Discharged', doctor: 'Dr. Alan Turner', treatmentCost: 33800, insuranceCovered: 30000, roomType: 'ICU', readmission: false, lengthOfStay: 8 }
+        ];
+
+        function loadSampleData() {
+            allData = JSON.parse(JSON.stringify(SAMPLE));
+            filteredData = [...allData];
+            showToast('Demo data loaded — 20 patient records', 'success');
+            renderDashboard();
+        }
+
+        // ─────────────────────────────────────────────
+        //  CLEAR
+        // ─────────────────────────────────────────────
+        function clearAllData() {
+            if (!allData.length) return;
+            if (!confirm('Clear all patient records and reset the dashboard?')) return;
+            allData = [];
+            filteredData = [];
+            destroyCharts();
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('emptyState').style.display = '';
+            document.getElementById('clearBtn').disabled = true;
+            document.getElementById('exportBtn').disabled = true;
+            document.getElementById('showCount').textContent = '0';
+            document.getElementById('totalCount').textContent = '0';
+            showToast('Dashboard cleared', 'info');
+        }
+
+        // ─────────────────────────────────────────────
+        //  EXPORT
+        // ─────────────────────────────────────────────
+        function exportFiltered() {
+            const blob = new Blob([JSON.stringify({ records: filteredData, exportDate: new Date().toISOString(), count: filteredData.length }, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'hospital_filtered_export.json';
+            a.click();
+            showToast(`Exported ${filteredData.length} records`, 'success');
+        }
+
+        // ─────────────────────────────────────────────
+        //  DELETE RECORD
+        // ─────────────────────────────────────────────
+        function deleteRecord(id) {
+            allData = allData.filter(r => r.id !== id);
+            filterTable();
+            updateCharts();
+            showToast(`Record ${id} deleted`, 'info');
+        }
+
+        // ─────────────────────────────────────────────
+        //  FILTER
+        // ─────────────────────────────────────────────
+        function filterTable() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const dept = document.getElementById('deptFilter').value;
+            const sev = document.getElementById('sevFilter').value;
+
+            filteredData = allData.filter(r => {
+                const matchSearch = !search || (r.name || '').toLowerCase().includes(search) ||
+                    (r.id || '').toLowerCase().includes(search) ||
+                    (r.diagnosis || '').toLowerCase().includes(search) ||
+                    (r.doctor || '').toLowerCase().includes(search);
+                const matchDept = !dept || r.department === dept;
+                const matchSev = !sev || r.severity === sev;
+                return matchSearch && matchDept && matchSev;
+            });
+
+            currentPage = 1;
+            renderTable();
+            document.getElementById('showCount').textContent = filteredData.length;
+            document.getElementById('totalCount').textContent = allData.length;
+            updateCharts();
+        }
+
+        // ─────────────────────────────────────────────
+        //  SORT
+        // ─────────────────────────────────────────────
+        function sortTable(key) {
+            if (sortKey === key) sortAsc = !sortAsc;
+            else { sortKey = key; sortAsc = true; }
+
+            filteredData.sort((a, b) => {
+                const va = a[key], vb = b[key];
+                if (typeof va === 'number') return sortAsc ? va - vb : vb - va;
+                return sortAsc ? String(va || '').localeCompare(String(vb || '')) : String(vb || '').localeCompare(String(va || ''));
+            });
+            renderTable();
+        }
+
+        // ─────────────────────────────────────────────
+        //  RENDER TABLE
+        // ─────────────────────────────────────────────
+        const COLORS = ['#3b9edd', '#22d3a5', '#f97316', '#a78bfa', '#fb7185', '#fbbf24', '#6ee7b7', '#93c5fd'];
+
+        function getAvatar(name, index) {
+            const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2);
+            const bg = COLORS[index % COLORS.length];
+            return `<div class="patient-avatar" style="background:${bg}">${initials}</div>`;
+        }
+
+        function sevClass(s) {
+            const m = { Critical: 'sev-critical', High: 'sev-high', Medium: 'sev-medium', Low: 'sev-low' };
+            return m[s] || 'sev-medium';
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const start = (currentPage - 1) * PAGE_SIZE;
+            const page = filteredData.slice(start, start + PAGE_SIZE);
+
+            if (!page.length) {
+                tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--text3)">No matching records found</td></tr>`;
+            } else {
+                tbody.innerHTML = page.map((r, i) => `
+      <tr>
+        <td><span style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--accent)">${r.id || '—'}</span></td>
+        <td>
+          <div class="patient-cell">
+            ${getAvatar(r.name || '?', start + i)}
+            <div>
+              <div class="patient-name">${r.name || 'Unknown'}</div>
+              <div class="patient-id">${r.gender || ''} · ${r.bloodType || ''}</div>
+            </div>
+          </div>
+        </td>
+        <td>${r.age || '—'}</td>
+        <td>${r.department || '—'}</td>
+        <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis">${r.diagnosis || '—'}</td>
+        <td><span class="severity-badge ${sevClass(r.severity)}">${r.severity || '—'}</span></td>
+        <td><span class="${r.status === 'Active' ? 'status-active' : 'status-discharged'}">${r.status === 'Active' ? '● Active' : '○ Discharged'}</span></td>
+        <td>${r.lengthOfStay != null ? r.lengthOfStay + ' d' : '—'}</td>
+        <td><span class="cost-cell">$${(r.treatmentCost || 0).toLocaleString()}</span></td>
+        <td>${r.doctor || '—'}</td>
+        <td>
+          <button class="delete-btn" onclick="deleteRecord('${r.id}')" title="Delete record">🗑</button>
+        </td>
+      </tr>
+    `).join('');
+            }
+
+            // Pagination
+            const total = filteredData.length;
+            const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+            document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages} · ${total} records`;
+            document.getElementById('tableCountBadge').textContent = `${total} Records`;
+
+            const btnContainer = document.getElementById('pageBtns');
+            let btns = '';
+            btns += `<button class="page-btn" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹</button>`;
+            for (let p = 1; p <= totalPages; p++) {
+                if (totalPages > 7 && Math.abs(p - currentPage) > 2 && p !== 1 && p !== totalPages) {
+                    if (p === 2 || p === totalPages - 1) btns += `<span style="padding:0 4px;color:var(--text3)">…</span>`;
+                    continue;
+                }
+                btns += `<button class="page-btn ${p === currentPage ? 'active' : ''}" onclick="goPage(${p})">${p}</button>`;
+            }
+            btns += `<button class="page-btn" onclick="goPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>›</button>`;
+            btnContainer.innerHTML = btns;
+        }
+
+        function goPage(p) {
+            const total = Math.ceil(filteredData.length / PAGE_SIZE);
+            if (p < 1 || p > total) return;
+            currentPage = p;
+            renderTable();
+        }
+
+        // ─────────────────────────────────────────────
+        //  KPI CARDS
+        // ─────────────────────────────────────────────
+        function renderKPIs() {
+            const data = filteredData;
+            const total = data.length;
+            const active = data.filter(r => r.status === 'Active').length;
+            const critical = data.filter(r => r.severity === 'Critical').length;
+            const totalCost = data.reduce((s, r) => s + (r.treatmentCost || 0), 0);
+            const avgLOS = total ? (data.reduce((s, r) => s + (r.lengthOfStay || 0), 0) / total).toFixed(1) : 0;
+            const readmit = total ? ((data.filter(r => r.readmission).length / total) * 100).toFixed(0) : 0;
+            const coverage = totalCost ? ((data.reduce((s, r) => s + (r.insuranceCovered || 0), 0) / totalCost) * 100).toFixed(0) : 0;
+            const depts = new Set(data.map(r => r.department)).size;
+
+            const kpis = [
+                { label: 'Total Patients', value: total, sub: `${active} currently active`, icon: '👥', color: 'var(--accent)' },
+                { label: 'Critical Cases', value: critical, sub: `${total ? ((critical / total) * 100).toFixed(0) : 0}% of total`, icon: '🚨', color: 'var(--critical)' },
+                { label: 'Avg. Length of Stay', value: avgLOS + 'd', sub: 'days per admission', icon: '📅', color: 'var(--accent2)' },
+                { label: 'Total Revenue', value: '$' + abbreviate(totalCost), sub: `${coverage}% insurance covered`, icon: '💰', color: 'var(--accent3)' },
+                { label: 'Readmission Rate', value: readmit + '%', sub: 'of discharged patients', icon: '🔁', color: 'var(--accent4)' },
+                { label: 'Departments', value: depts, sub: 'active clinical units', icon: '🏢', color: 'var(--accent5)' },
+            ];
+
+            document.getElementById('kpiGrid').innerHTML = kpis.map(k => `
+    <div class="kpi-card" style="--card-color:${k.color}">
+      <div class="kpi-icon">${k.icon}</div>
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value">${k.value}</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>
+  `).join('');
+        }
+
+        function abbreviate(n) {
+            if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+            if (n >= 1e3) return (n / 1e3).toFixed(0) + 'K';
+            return n.toString();
+        }
+
+        // ─────────────────────────────────────────────
+        //  CHART CONFIG HELPERS
+        // ─────────────────────────────────────────────
+        Chart.defaults.color = '#8fa3bf';
+        Chart.defaults.borderColor = 'rgba(99,179,237,0.08)';
+        Chart.defaults.font.family = "'DM Sans', sans-serif";
+
+        const PALETTE = ['#3b9edd', '#22d3a5', '#f97316', '#a78bfa', '#fb7185', '#fbbf24', '#6ee7b7', '#93c5fd', '#c4b5fd', '#fdba74'];
+
+        function baseOptions(title = '') {
+            return {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#0d1422',
+                        borderColor: 'rgba(99,179,237,0.25)',
+                        borderWidth: 1,
+                        titleColor: '#e8edf5',
+                        bodyColor: '#8fa3bf',
+                        padding: 10,
+                        cornerRadius: 8,
+                        callbacks: {}
+                    }
+                },
+                scales: {
+                    x: { grid: { color: 'rgba(99,179,237,0.06)' }, ticks: { color: '#4a6080' } },
+                    y: { grid: { color: 'rgba(99,179,237,0.06)' }, ticks: { color: '#4a6080' } }
+                }
+            };
+        }
+
+        function destroyCharts() {
+            Object.values(charts).forEach(c => { try { c.destroy(); } catch (e) { } });
+            charts = {};
+        }
+
+        // ─────────────────────────────────────────────
+        //  BUILD ALL CHARTS
+        // ─────────────────────────────────────────────
+        function buildCharts() {
+            destroyCharts();
+            const data = filteredData;
+
+            // 1. Department Bar Chart
+            const deptCounts = {};
+            data.forEach(r => { deptCounts[r.department] = (deptCounts[r.department] || 0) + 1; });
+            const deptLabels = Object.keys(deptCounts).sort((a, b) => deptCounts[b] - deptCounts[a]);
+            charts.dept = new Chart(document.getElementById('deptChart'), {
+                type: 'bar',
+                data: {
+                    labels: deptLabels,
+                    datasets: [{ data: deptLabels.map(d => deptCounts[d]), backgroundColor: PALETTE.map(c => c + 'bb'), borderColor: PALETTE, borderWidth: 1.5, borderRadius: 5 }]
+                },
+                options: { ...baseOptions(), plugins: { ...baseOptions().plugins, legend: { display: false } } }
+            });
+
+            // 2. Severity Donut
+            const sevCounts = {};
+            data.forEach(r => { sevCounts[r.severity] = (sevCounts[r.severity] || 0) + 1; });
+            const sevColors = { Critical: '#fb7185', High: '#f97316', Medium: '#fbbf24', Low: '#22d3a5' };
+            charts.sev = new Chart(document.getElementById('sevChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(sevCounts),
+                    datasets: [{ data: Object.values(sevCounts), backgroundColor: Object.keys(sevCounts).map(s => sevColors[s] || '#8fa3bf'), borderWidth: 2, borderColor: '#0d1422', hoverOffset: 8 }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: {
+                        legend: { display: true, position: 'right', labels: { color: '#8fa3bf', usePointStyle: true, padding: 12, font: { size: 12 } } },
+                        tooltip: { backgroundColor: '#0d1422', borderColor: 'rgba(99,179,237,0.25)', borderWidth: 1, titleColor: '#e8edf5', bodyColor: '#8fa3bf', padding: 10, cornerRadius: 8 }
+                    }
+                }
+            });
+
+            // 3. Cost Stacked Bar (top 8 depts by cost)
+            const deptCost = {};
+            const deptCov = {};
+            data.forEach(r => {
+                deptCost[r.department] = (deptCost[r.department] || 0) + (r.treatmentCost || 0);
+                deptCov[r.department] = (deptCov[r.department] || 0) + (r.insuranceCovered || 0);
+            });
+            const costDepts = Object.keys(deptCost).sort((a, b) => deptCost[b] - deptCost[a]).slice(0, 8);
+            charts.cost = new Chart(document.getElementById('costChart'), {
+                type: 'bar',
+                data: {
+                    labels: costDepts,
+                    datasets: [
+                        { label: 'Out of Pocket', data: costDepts.map(d => (deptCost[d] || 0) - (deptCov[d] || 0)), backgroundColor: '#fb718577', borderColor: '#fb7185', borderWidth: 1, borderRadius: { topLeft: 0, topRight: 0, bottomLeft: 4, bottomRight: 4 } },
+                        { label: 'Insurance Covered', data: costDepts.map(d => deptCov[d] || 0), backgroundColor: '#22d3a577', borderColor: '#22d3a5', borderWidth: 1, borderRadius: { topLeft: 4, topRight: 4, bottomLeft: 0, bottomRight: 0 } }
+                    ]
+                },
+                options: { ...baseOptions(), plugins: { ...baseOptions().plugins, legend: { display: true, position: 'bottom', labels: { color: '#8fa3bf', usePointStyle: true, padding: 12, font: { size: 11 } } } }, scales: { x: { stacked: true, grid: { color: 'rgba(99,179,237,0.06)' }, ticks: { color: '#4a6080', font: { size: 10 } } }, y: { stacked: true, grid: { color: 'rgba(99,179,237,0.06)' }, ticks: { color: '#4a6080', callback: v => '$' + abbreviate(v) } } } }
+            });
+
+            // 4. Gender Pie
+            const genderCount = {};
+            data.forEach(r => { genderCount[r.gender || 'Unknown'] = (genderCount[r.gender || 'Unknown'] || 0) + 1; });
+            charts.gender = new Chart(document.getElementById('genderChart'), {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(genderCount),
+                    datasets: [{ data: Object.values(genderCount), backgroundColor: ['#3b9edd99', '#fb718599', '#22d3a599', '#a78bfa99'], borderColor: ['#3b9edd', '#fb7185', '#22d3a5', '#a78bfa'], borderWidth: 2, hoverOffset: 8 }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, plugins: {
+                        legend: { display: true, position: 'bottom', labels: { color: '#8fa3bf', usePointStyle: true, padding: 12 } },
+                        tooltip: { backgroundColor: '#0d1422', borderColor: 'rgba(99,179,237,0.25)', borderWidth: 1, titleColor: '#e8edf5', bodyColor: '#8fa3bf', padding: 10, cornerRadius: 8 }
+                    }
+                }
+            });
+
+            // 5. Room Type Doughnut
+            const roomCount = {};
+            data.forEach(r => { roomCount[r.roomType || 'Unknown'] = (roomCount[r.roomType || 'Unknown'] || 0) + 1; });
+            charts.room = new Chart(document.getElementById('roomChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(roomCount),
+                    datasets: [{ data: Object.values(roomCount), backgroundColor: PALETTE.map(c => c + '99'), borderColor: PALETTE, borderWidth: 1.5, hoverOffset: 8 }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: {
+                        legend: { display: true, position: 'bottom', labels: { color: '#8fa3bf', usePointStyle: true, padding: 10, font: { size: 11 } } },
+                        tooltip: { backgroundColor: '#0d1422', borderColor: 'rgba(99,179,237,0.25)', borderWidth: 1, titleColor: '#e8edf5', bodyColor: '#8fa3bf', padding: 10, cornerRadius: 8 }
+                    }
+                }
+            });
+
+            // 6. Trend Line Chart — admissions by month & severity
+            const monthSev = {};
+            data.forEach(r => {
+                if (!r.admissionDate) return;
+                const mo = r.admissionDate.slice(0, 7);
+                if (!monthSev[mo]) monthSev[mo] = { Critical: 0, High: 0, Medium: 0, Low: 0 };
+                monthSev[mo][r.severity] = (monthSev[mo][r.severity] || 0) + 1;
+            });
+            const months = Object.keys(monthSev).sort();
+            const sevColors2 = { Critical: '#fb7185', High: '#f97316', Medium: '#fbbf24', Low: '#22d3a5' };
+            charts.trend = new Chart(document.getElementById('trendChart'), {
+                type: 'line',
+                data: {
+                    labels: months.map(m => { const d = new Date(m + '-01'); return d.toLocaleDateString('en', { month: 'short', year: '2-digit' }); }),
+                    datasets: ['Critical', 'High', 'Medium', 'Low'].map(s => ({
+                        label: s, data: months.map(m => monthSev[m][s] || 0),
+                        borderColor: sevColors2[s], backgroundColor: sevColors2[s] + '22',
+                        borderWidth: 2, pointRadius: 4, pointHoverRadius: 6,
+                        fill: true, tension: 0.4
+                    }))
+                },
+                options: { ...baseOptions(), plugins: { ...baseOptions().plugins, legend: { display: true, position: 'top', labels: { color: '#8fa3bf', usePointStyle: true, padding: 16, font: { size: 12 } } } } }
+            });
+
+            // 7. Age Histogram
+            const ageBuckets = { '0-19': 0, '20-29': 0, '30-39': 0, '40-49': 0, '50-59': 0, '60-69': 0, '70-79': 0, '80+': 0 };
+            data.forEach(r => {
+                const a = r.age || 0;
+                if (a < 20) ageBuckets['0-19']++;
+                else if (a < 30) ageBuckets['20-29']++;
+                else if (a < 40) ageBuckets['30-39']++;
+                else if (a < 50) ageBuckets['40-49']++;
+                else if (a < 60) ageBuckets['50-59']++;
+                else if (a < 70) ageBuckets['60-69']++;
+                else if (a < 80) ageBuckets['70-79']++;
+                else ageBuckets['80+']++;
+            });
+            charts.age = new Chart(document.getElementById('ageHistChart'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(ageBuckets),
+                    datasets: [{ label: 'Patients', data: Object.values(ageBuckets), backgroundColor: '#3b9edd55', borderColor: '#3b9edd', borderWidth: 1.5, borderRadius: 4 }]
+                },
+                options: { ...baseOptions(), plugins: { ...baseOptions().plugins } }
+            });
+
+            // 8. LOS Horizontal Bar
+            const losDept = {};
+            const losDeptCount = {};
+            data.forEach(r => {
+                if (r.department && r.lengthOfStay) {
+                    losDept[r.department] = (losDept[r.department] || 0) + r.lengthOfStay;
+                    losDeptCount[r.department] = (losDeptCount[r.department] || 0) + 1;
+                }
+            });
+            const losLabels = Object.keys(losDept).sort((a, b) => (losDept[b] / losDeptCount[b]) - (losDept[a] / losDeptCount[a]));
+            charts.los = new Chart(document.getElementById('losChart'), {
+                type: 'bar',
+                data: {
+                    labels: losLabels,
+                    datasets: [{ label: 'Avg Days', data: losLabels.map(d => +(losDept[d] / losDeptCount[d]).toFixed(1)), backgroundColor: PALETTE.map(c => c + '99'), borderColor: PALETTE, borderWidth: 1.5, borderRadius: 4 }]
+                },
+                options: {
+                    ...baseOptions(), indexAxis: 'y', plugins: { ...baseOptions().plugins, legend: { display: false } }, scales: {
+                        x: { grid: { color: 'rgba(99,179,237,0.06)' }, ticks: { color: '#4a6080', callback: v => v + 'd' } },
+                        y: { grid: { display: false }, ticks: { color: '#4a6080', font: { size: 11 } } }
+                    }
+                }
+            });
+
+            // 9. Scatter: Cost vs LOS
+            charts.scatter = new Chart(document.getElementById('scatterChart'), {
+                type: 'scatter',
+                data: {
+                    datasets: ['Critical', 'High', 'Medium', 'Low'].map((s, i) => ({
+                        label: s,
+                        data: data.filter(r => r.severity === s).map(r => ({ x: r.lengthOfStay || 0, y: r.treatmentCost || 0 })),
+                        backgroundColor: [PALETTE[4], PALETTE[2], PALETTE[5], PALETTE[1]][i] + 'aa',
+                        borderColor: [PALETTE[4], PALETTE[2], PALETTE[5], PALETTE[1]][i],
+                        pointRadius: 6, pointHoverRadius: 9
+                    }))
+                },
+                options: {
+                    ...baseOptions(), plugins: { ...baseOptions().plugins, legend: { display: true, position: 'top', labels: { color: '#8fa3bf', usePointStyle: true, padding: 16, font: { size: 12 } } } },
+                    scales: {
+                        x: { ...baseOptions().scales.x, title: { display: true, text: 'Length of Stay (days)', color: '#4a6080' } },
+                        y: { ...baseOptions().scales.y, title: { display: true, text: 'Treatment Cost ($)', color: '#4a6080' }, ticks: { color: '#4a6080', callback: v => '$' + abbreviate(v) } }
+                    }
+                }
+            });
+
+            // 10. Radar: Readmission rate by dept
+            const radarDepts = Object.keys(deptCounts).slice(0, 7);
+            const readmitRates = radarDepts.map(d => {
+                const recs = data.filter(r => r.department === d);
+                const rate = recs.length ? +(recs.filter(r => r.readmission).length / recs.length * 100).toFixed(0) : 0;
+                return rate;
+            });
+            charts.radar = new Chart(document.getElementById('radarChart'), {
+                type: 'radar',
+                data: {
+                    labels: radarDepts,
+                    datasets: [{
+                        label: 'Readmission %',
+                        data: readmitRates,
+                        backgroundColor: 'rgba(251,113,133,0.15)',
+                        borderColor: '#fb7185',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#fb7185',
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, plugins: {
+                        legend: { display: false },
+                        tooltip: { backgroundColor: '#0d1422', borderColor: 'rgba(99,179,237,0.25)', borderWidth: 1, titleColor: '#e8edf5', bodyColor: '#8fa3bf', padding: 10, cornerRadius: 8 }
+                    }, scales: {
+                        r: {
+                            grid: { color: 'rgba(99,179,237,0.1)' },
+                            angleLines: { color: 'rgba(99,179,237,0.1)' },
+                            ticks: { backdropColor: 'transparent', color: '#4a6080', font: { size: 10 } },
+                            pointLabels: { color: '#8fa3bf', font: { size: 11 } },
+                            suggestedMax: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateCharts() {
+            renderKPIs();
+            renderTable();
+            buildCharts();
+            updateFilters();
+        }
+
+        // ─────────────────────────────────────────────
+        //  UPDATE DEPT FILTER OPTIONS
+        // ─────────────────────────────────────────────
+        function updateFilters() {
+            const depts = [...new Set(allData.map(r => r.department).filter(Boolean))].sort();
+            const sel = document.getElementById('deptFilter');
+            const current = sel.value;
+            sel.innerHTML = '<option value="">All Departments</option>' + depts.map(d => `<option value="${d}" ${d === current ? 'selected' : ''}>${d}</option>`).join('');
+        }
+
+        // ─────────────────────────────────────────────
+        //  RENDER FULL DASHBOARD
+        // ─────────────────────────────────────────────
+        function renderDashboard() {
+            document.getElementById('emptyState').style.display = 'none';
+            const dash = document.getElementById('dashboard');
+            dash.style.display = 'flex';
+            dash.style.flexDirection = 'column';
+            dash.style.gap = '24px';
+
+            filteredData = [...allData];
+            updateFilters();
+            renderKPIs();
+            renderTable();
+            buildCharts();
+
+            document.getElementById('clearBtn').disabled = false;
+            document.getElementById('exportBtn').disabled = false;
+            document.getElementById('showCount').textContent = filteredData.length;
+            document.getElementById('totalCount').textContent = allData.length;
+        }
+    </script>
+</body>
+
+</html>

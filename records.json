@@ -1,0 +1,760 @@
+{
+    "hospital": {
+        "name": "MedCore General Hospital",
+        "location": "New York, NY",
+        "established": 1987,
+        "beds": 850,
+        "departments": 24
+    },
+    "records": [
+        {
+            "id": "P-001",
+            "name": "James Thornton",
+            "age": 54,
+            "gender": "Male",
+            "bloodType": "A+",
+            "department": "Cardiology",
+            "admissionDate": "2024-01-05",
+            "dischargeDate": "2024-01-12",
+            "diagnosis": "Acute Myocardial Infarction",
+            "severity": "Critical",
+            "status": "Discharged",
+            "doctor": "Dr. Sarah Chen",
+            "treatmentCost": 24500,
+            "insuranceCovered": 20000,
+            "roomType": "ICU",
+            "readmission": false,
+            "labResults": {
+                "hemoglobin": 11.2,
+                "whiteBloodCells": 9800,
+                "platelets": 210000,
+                "glucose": 145,
+                "cholesterol": 238
+            },
+            "vitals": {
+                "heartRate": 95,
+                "bloodPressure": "148/92",
+                "temperature": 98.9,
+                "oxygenSaturation": 94
+            },
+            "medications": [
+                "Aspirin",
+                "Atorvastatin",
+                "Metoprolol",
+                "Lisinopril"
+            ],
+            "lengthOfStay": 7
+        },
+        {
+            "id": "P-002",
+            "name": "Maria Gonzalez",
+            "age": 34,
+            "gender": "Female",
+            "bloodType": "O-",
+            "department": "Obstetrics",
+            "admissionDate": "2024-01-08",
+            "dischargeDate": "2024-01-11",
+            "diagnosis": "Normal Delivery",
+            "severity": "Low",
+            "status": "Discharged",
+            "doctor": "Dr. Emily Watkins",
+            "treatmentCost": 7800,
+            "insuranceCovered": 7000,
+            "roomType": "Standard",
+            "readmission": false,
+            "labResults": {
+                "hemoglobin": 10.8,
+                "whiteBloodCells": 12000,
+                "platelets": 185000,
+                "glucose": 98,
+                "cholesterol": 182
+            },
+            "vitals": {
+                "heartRate": 78,
+                "bloodPressure": "118/76",
+                "temperature": 98.6,
+                "oxygenSaturation": 99
+            },
+            "medications": [
+                "Iron Supplement",
+                "Prenatal Vitamins"
+            ],
+            "lengthOfStay": 3
+        },
+        {
+            "id": "P-003",
+            "name": "Robert Kim",
+            "age": 67,
+            "gender": "Male",
+            "bloodType": "B+",
+            "department": "Neurology",
+            "admissionDate": "2024-01-10",
+            "dischargeDate": "2024-01-22",
+            "diagnosis": "Ischemic Stroke",
+            "severity": "High",
+            "status": "Discharged",
+            "doctor": "Dr. Michael Park",
+            "treatmentCost": 38200,
+            "insuranceCovered": 32000,
+            "roomType": "ICU",
+            "readmission": true,
+            "labResults": {
+                "hemoglobin": 12.4,
+                "whiteBloodCells": 11200,
+                "platelets": 195000,
+                "glucose": 162,
+                "cholesterol": 265
+            },
+            "vitals": {
+                "heartRate": 88,
+                "bloodPressure": "162/98",
+                "temperature": 99.1,
+                "oxygenSaturation": 96
+            },
+            "medications": [
+                "Warfarin",
+                "Clopidogrel",
+                "Amlodipine",
+                "Rosuvastatin"
+            ],
+            "lengthOfStay": 12
+        },
+        {
+            "id": "P-004",
+            "name": "Linda Foster",
+            "age": 45,
+            "gender": "Female",
+            "bloodType": "AB+",
+            "department": "Oncology",
+            "admissionDate": "2024-01-14",
+            "dischargeDate": "2024-01-28",
+            "diagnosis": "Breast Cancer Stage II",
+            "severity": "High",
+            "status": "Discharged",
+            "doctor": "Dr. Julia Roberts",
+            "treatmentCost": 52000,
+            "insuranceCovered": 45000,
+            "roomType": "Private",
+            "readmission": false,
+            "labResults": {
+                "hemoglobin": 9.8,
+                "whiteBloodCells": 5200,
+                "platelets": 320000,
+                "glucose": 105,
+                "cholesterol": 198
+            },
+            "vitals": {
+                "heartRate": 82,
+                "bloodPressure": "122/80",
+                "temperature": 98.4,
+                "oxygenSaturation": 98
+            },
+            "medications": [
+                "Tamoxifen",
+                "Doxorubicin",
+                "Cyclophosphamide"
+            ],
+            "lengthOfStay": 14
+        },
+        {
+            "id": "P-005",
+            "name": "Charles Whitfield",
+            "age": 72,
+            "gender": "Male",
+            "bloodType": "A-",
+            "department": "Orthopedics",
+            "admissionDate": "2024-01-16",
+            "dischargeDate": "2024-01-23",
+            "diagnosis": "Hip Fracture",
+            "severity": "Medium",
+            "status": "Discharged",
+            "doctor": "Dr. Alan Turner",
+            "treatmentCost": 29800,
+            "insuranceCovered": 25000,
+            "roomType": "Semi-Private",
+            "readmission": false,
+            "labResults": {
+                "hemoglobin": 11.8,
+                "whiteBloodCells": 8400,
+                "platelets": 225000,
+                "glucose": 118,
+                "cholesterol": 210
+            },
+            "vitals": {
+                "heartRate": 74,
+                "bloodPressure": "132/84",
+                "temperature": 98.7,
+                "oxygenSaturation": 97
+            },
+            "medications": [
+                "Morphine",
+                "Calcium",
+                "Vitamin D",
+                "Enoxaparin"
+            ],
+            "lengthOfStay": 7
+        },
+        {
+            "id": "P-006",
+            "name": "Priya Sharma",
+            "age": 29,
+            "gender": "Female",
+            "bloodType": "O+",
+            "department": "Emergency",
+            "admissionDate": "2024-01-18",
+            "dischargeDate": "2024-01-20",
+            "diagnosis": "Appendicitis",
+            "severity": "Medium",
+            "status": "Discharged",
+            "doctor": "Dr. Kevin Nguyen",
+            "treatmentCost": 12500,
+            "insuranceCovered": 11000,
+            "roomType": "Standard",
+            "readmission": false,
+            "labResults": {
+                "hemoglobin": 13.2,
+                "whiteBloodCells": 15600,
+                "platelets": 275000,
+                "glucose": 92,
+                "cholesterol": 168
+            },
+            "vitals": {
+                "heartRate": 102,
+                "bloodPressure": "126/82",
+                "temperature": 100.4,
+                "oxygenSaturation": 98
+            },
+            "medications": [
+                "Cefazolin",
+                "Metronidazole",
+                "Ibuprofen"
+            ],
+            "lengthOfStay": 2
+        },
+        {
+            "id": "P-007",
+            "name": "David Okonkwo",
+            "age": 38,
+            "gender": "Male",
+            "bloodType": "B-",
+            "department": "Pulmonology",
+            "admissionDate": "2024-02-02",
+            "dischargeDate": "2024-02-09",
+            "diagnosis": "Severe Pneumonia",
+            "severity": "High",
+            "status": "Discharged",
+            "doctor": "Dr. Sarah Chen",
+            "treatmentCost": 18900,
+            "insuranceCovered": 16000,
+            "roomType": "Semi-Private",
+            "readmission": false,
+            "labResults": {
+                "hemoglobin": 12.1,
+                "whiteBloodCells": 18200,
+                "platelets": 290000,
+                "glucose": 108,
+                "cholesterol": 178
+            },
+            "vitals": {
+                "heartRate": 112,
+                "bloodPressure": "118/74",
+                "temperature": 102.8,
+                "oxygenSaturation": 91
+            },
+            "medications": [
+                "Azithromycin",
+                "Ceftriaxone",
+                "Prednisone"
+            ],
+            "lengthOfStay": 7
+        },
+        {
+            "id": "P-008",
+            "name": "Susan McCarthy",
+            "age": 61,
+            "gender": "Female",
+            "bloodType": "AB-",
+            "department": "Endocrinology",
+            "admissionDate": "2024-02-05",
+            "dischargeDate": "2024-02-10",
+            "diagnosis": "Diabetic Ketoacidosis",
+            "severity": "Critical",
+            "status": "Discharged",
+            "doctor": "Dr. Aisha Patel",
+            "treatmentCost": 22100,
+            "insuranceCovered": 19000,
+            "roomType": "ICU",
+            "readmission": true,
+            "labResults": {
+                "hemoglobin": 10.5,
+                "whiteBloodCells": 13400,
+                "platelets": 198000,
+                "glucose": 520,
+                "cholesterol": 242
+            },
+            "vitals": {
+                "heartRate": 118,
+                "bloodPressure": "108/68",
+                "temperature": 99.8,
+                "oxygenSaturation": 95
+            },
+            "medications": [
+                "Insulin",
+                "Potassium Chloride",
+                "Normal Saline"
+            ],
+            "lengthOfStay": 5
+        },
+        {
+            "id": "P-009",
+            "name": "Thomas Andersen",
+            "age": 50,
+            "gender": "Male",
+            "bloodType": "A+",
+            "department": "Gastroenterology",
+            "admissionDate": "2024-02-12",
+            "dischargeDate": "2024-02-17",
+            "diagnosis": "Acute Pancreatitis",
+            "severity": "Medium",
+            "status": "Discharged",
+            "doctor": "Dr. Michael Park",
+            "treatmentCost": 16700,
+            "insuranceCovered": 14000,
+            "roomType": "Standard",
+            "readmission": false,
+            "labResults": {
+                "hemoglobin": 13.8,
+                "whiteBloodCells": 14200,
+                "platelets": 245000,
+                "glucose": 135,
+                "cholesterol": 220
+            },
+            "vitals": {
+                "heartRate": 96,
+                "bloodPressure": "134/86",
+                "temperature": 100.1,
+                "oxygenSaturation": 97
+            },
+            "medications": [
+                "Morphine",
+                "Pantoprazole",
+                "IV Fluids"
+            ],
+            "lengthOfStay": 5
+        },
+        {
+            "id": "P-010",
+            "name": "Angela Harrison",
+            "age": 42,
+            "gender": "Female",
+            "bloodType": "O+",
+            "department": "Psychiatry",
+            "admissionDate": "2024-02-14",
+            "dischargeDate": "2024-02-28",
+            "diagnosis": "Severe Depression with Psychosis",
+            "severity": "High",
+            "status": "Discharged",
+            "doctor": "Dr. Julia Roberts",
+            "treatmentCost": 14800,
+            "insuranceCovered": 12000,
+            "roomType": "Private",
+            "readmission": false,
+            "labResults": {
+                "hemoglobin": 12.9,
+                "whiteBloodCells": 7800,
+                "platelets": 210000,
+                "glucose": 95,
+                "cholesterol": 192
+            },
+            "vitals": {
+                "heartRate": 72,
+                "bloodPressure": "116/72",
+                "temperature": 98.2,
+                "oxygenSaturation": 99
+            },
+            "medications": [
+                "Olanzapine",
+                "Sertraline",
+                "Lorazepam"
+            ],
+            "lengthOfStay": 14
+        },
+        {
+            "id": "P-011",
+            "name": "Carlos Rivera",
+            "age": 58,
+            "gender": "Male",
+            "bloodType": "B+",
+            "department": "Nephrology",
+            "admissionDate": "2024-02-20",
+            "dischargeDate": "2024-03-05",
+            "diagnosis": "Chronic Kidney Disease Stage 4",
+            "severity": "High",
+            "status": "Discharged",
+            "doctor": "Dr. Alan Turner",
+            "treatmentCost": 41600,
+            "insuranceCovered": 38000,
+            "roomType": "Semi-Private",
+            "readmission": true,
+            "labResults": {
+                "hemoglobin": 8.9,
+                "whiteBloodCells": 9200,
+                "platelets": 175000,
+                "glucose": 142,
+                "cholesterol": 256
+            },
+            "vitals": {
+                "heartRate": 86,
+                "bloodPressure": "154/96",
+                "temperature": 98.6,
+                "oxygenSaturation": 96
+            },
+            "medications": [
+                "Erythropoietin",
+                "Furosemide",
+                "Sodium Bicarbonate"
+            ],
+            "lengthOfStay": 13
+        },
+        {
+            "id": "P-012",
+            "name": "Natalie Brooks",
+            "age": 26,
+            "gender": "Female",
+            "bloodType": "A-",
+            "department": "Dermatology",
+            "admissionDate": "2024-03-01",
+            "dischargeDate": "2024-03-04",
+            "diagnosis": "Stevens-Johnson Syndrome",
+            "severity": "Critical",
+            "status": "Discharged",
+            "doctor": "Dr. Kevin Nguyen",
+            "treatmentCost": 19300,
+            "insuranceCovered": 17000,
+            "roomType": "ICU",
+            "readmission": false,
+            "labResults": {
+                "hemoglobin": 11.5,
+                "whiteBloodCells": 22000,
+                "platelets": 142000,
+                "glucose": 88,
+                "cholesterol": 158
+            },
+            "vitals": {
+                "heartRate": 105,
+                "bloodPressure": "104/66",
+                "temperature": 103.2,
+                "oxygenSaturation": 93
+            },
+            "medications": [
+                "IVIG",
+                "Methylprednisolone",
+                "Morphine"
+            ],
+            "lengthOfStay": 3
+        },
+        {
+            "id": "P-013",
+            "name": "Henry Mitchell",
+            "age": 79,
+            "gender": "Male",
+            "bloodType": "O-",
+            "department": "Cardiology",
+            "admissionDate": "2024-03-08",
+            "dischargeDate": "2024-03-20",
+            "diagnosis": "Congestive Heart Failure",
+            "severity": "Critical",
+            "status": "Discharged",
+            "doctor": "Dr. Sarah Chen",
+            "treatmentCost": 48700,
+            "insuranceCovered": 42000,
+            "roomType": "ICU",
+            "readmission": true,
+            "labResults": {
+                "hemoglobin": 10.1,
+                "whiteBloodCells": 10800,
+                "platelets": 165000,
+                "glucose": 128,
+                "cholesterol": 278
+            },
+            "vitals": {
+                "heartRate": 124,
+                "bloodPressure": "168/102",
+                "temperature": 98.9,
+                "oxygenSaturation": 88
+            },
+            "medications": [
+                "Furosemide",
+                "Digoxin",
+                "Spironolactone",
+                "Carvedilol"
+            ],
+            "lengthOfStay": 12
+        },
+        {
+            "id": "P-014",
+            "name": "Fatima Al-Rashid",
+            "age": 33,
+            "gender": "Female",
+            "bloodType": "AB+",
+            "department": "Rheumatology",
+            "admissionDate": "2024-03-12",
+            "dischargeDate": "2024-03-18",
+            "diagnosis": "Systemic Lupus Erythematosus Flare",
+            "severity": "Medium",
+            "status": "Discharged",
+            "doctor": "Dr. Aisha Patel",
+            "treatmentCost": 15600,
+            "insuranceCovered": 13000,
+            "roomType": "Standard",
+            "readmission": false,
+            "labResults": {
+                "hemoglobin": 10.3,
+                "whiteBloodCells": 3800,
+                "platelets": 88000,
+                "glucose": 96,
+                "cholesterol": 175
+            },
+            "vitals": {
+                "heartRate": 88,
+                "bloodPressure": "124/80",
+                "temperature": 101.2,
+                "oxygenSaturation": 98
+            },
+            "medications": [
+                "Hydroxychloroquine",
+                "Prednisone",
+                "Mycophenolate"
+            ],
+            "lengthOfStay": 6
+        },
+        {
+            "id": "P-015",
+            "name": "George Patterson",
+            "age": 65,
+            "gender": "Male",
+            "bloodType": "B+",
+            "department": "Urology",
+            "admissionDate": "2024-03-22",
+            "dischargeDate": "2024-03-26",
+            "diagnosis": "Prostate Cancer - Radical Prostatectomy",
+            "severity": "Medium",
+            "status": "Discharged",
+            "doctor": "Dr. Emily Watkins",
+            "treatmentCost": 32400,
+            "insuranceCovered": 28000,
+            "roomType": "Private",
+            "readmission": false,
+            "labResults": {
+                "hemoglobin": 12.6,
+                "whiteBloodCells": 8900,
+                "platelets": 232000,
+                "glucose": 112,
+                "cholesterol": 225
+            },
+            "vitals": {
+                "heartRate": 70,
+                "bloodPressure": "128/82",
+                "temperature": 98.6,
+                "oxygenSaturation": 98
+            },
+            "medications": [
+                "Ketorolac",
+                "Enoxaparin",
+                "Oxybutynin"
+            ],
+            "lengthOfStay": 4
+        },
+        {
+            "id": "P-016",
+            "name": "Elena Petrov",
+            "age": 48,
+            "gender": "Female",
+            "bloodType": "A+",
+            "department": "Neurology",
+            "admissionDate": "2024-04-01",
+            "dischargeDate": "2024-04-08",
+            "diagnosis": "Multiple Sclerosis Relapse",
+            "severity": "Medium",
+            "status": "Discharged",
+            "doctor": "Dr. Michael Park",
+            "treatmentCost": 21800,
+            "insuranceCovered": 19500,
+            "roomType": "Standard",
+            "readmission": false,
+            "labResults": {
+                "hemoglobin": 11.9,
+                "whiteBloodCells": 7400,
+                "platelets": 218000,
+                "glucose": 102,
+                "cholesterol": 187
+            },
+            "vitals": {
+                "heartRate": 76,
+                "bloodPressure": "120/76",
+                "temperature": 98.8,
+                "oxygenSaturation": 99
+            },
+            "medications": [
+                "Methylprednisolone",
+                "Interferon Beta",
+                "Baclofen"
+            ],
+            "lengthOfStay": 7
+        },
+        {
+            "id": "P-017",
+            "name": "Omar Khalil",
+            "age": 43,
+            "gender": "Male",
+            "bloodType": "O+",
+            "department": "Cardiology",
+            "admissionDate": "2024-04-05",
+            "dischargeDate": "2024-04-11",
+            "diagnosis": "Cardiac Arrhythmia - Ablation",
+            "severity": "Medium",
+            "status": "Discharged",
+            "doctor": "Dr. Sarah Chen",
+            "treatmentCost": 27300,
+            "insuranceCovered": 24000,
+            "roomType": "Semi-Private",
+            "readmission": false,
+            "labResults": {
+                "hemoglobin": 13.5,
+                "whiteBloodCells": 7900,
+                "platelets": 260000,
+                "glucose": 98,
+                "cholesterol": 205
+            },
+            "vitals": {
+                "heartRate": 138,
+                "bloodPressure": "136/88",
+                "temperature": 98.4,
+                "oxygenSaturation": 97
+            },
+            "medications": [
+                "Amiodarone",
+                "Warfarin",
+                "Metoprolol"
+            ],
+            "lengthOfStay": 6
+        },
+        {
+            "id": "P-018",
+            "name": "Dorothy Chang",
+            "age": 71,
+            "gender": "Female",
+            "bloodType": "AB-",
+            "department": "Oncology",
+            "admissionDate": "2024-04-10",
+            "dischargeDate": "2024-04-24",
+            "diagnosis": "Non-Hodgkin Lymphoma",
+            "severity": "High",
+            "status": "Active",
+            "doctor": "Dr. Julia Roberts",
+            "treatmentCost": 64200,
+            "insuranceCovered": 58000,
+            "roomType": "Private",
+            "readmission": false,
+            "labResults": {
+                "hemoglobin": 9.2,
+                "whiteBloodCells": 4100,
+                "platelets": 95000,
+                "glucose": 115,
+                "cholesterol": 196
+            },
+            "vitals": {
+                "heartRate": 84,
+                "bloodPressure": "118/74",
+                "temperature": 98.9,
+                "oxygenSaturation": 97
+            },
+            "medications": [
+                "Rituximab",
+                "Cyclophosphamide",
+                "Doxorubicin",
+                "Prednisone"
+            ],
+            "lengthOfStay": 14
+        },
+        {
+            "id": "P-019",
+            "name": "Marcus Johnson",
+            "age": 22,
+            "gender": "Male",
+            "bloodType": "B-",
+            "department": "Emergency",
+            "admissionDate": "2024-04-15",
+            "dischargeDate": "2024-04-17",
+            "diagnosis": "Traumatic Brain Injury - Mild",
+            "severity": "Medium",
+            "status": "Discharged",
+            "doctor": "Dr. Kevin Nguyen",
+            "treatmentCost": 8900,
+            "insuranceCovered": 8000,
+            "roomType": "Standard",
+            "readmission": false,
+            "labResults": {
+                "hemoglobin": 14.2,
+                "whiteBloodCells": 9600,
+                "platelets": 310000,
+                "glucose": 94,
+                "cholesterol": 162
+            },
+            "vitals": {
+                "heartRate": 80,
+                "bloodPressure": "122/78",
+                "temperature": 98.6,
+                "oxygenSaturation": 99
+            },
+            "medications": [
+                "Acetaminophen",
+                "Ondansetron"
+            ],
+            "lengthOfStay": 2
+        },
+        {
+            "id": "P-020",
+            "name": "Isabella Romano",
+            "age": 37,
+            "gender": "Female",
+            "bloodType": "A+",
+            "department": "Pulmonology",
+            "admissionDate": "2024-04-20",
+            "dischargeDate": "2024-04-28",
+            "diagnosis": "Pulmonary Embolism",
+            "severity": "Critical",
+            "status": "Discharged",
+            "doctor": "Dr. Alan Turner",
+            "treatmentCost": 33800,
+            "insuranceCovered": 30000,
+            "roomType": "ICU",
+            "readmission": false,
+            "labResults": {
+                "hemoglobin": 12.8,
+                "whiteBloodCells": 12400,
+                "platelets": 240000,
+                "glucose": 106,
+                "cholesterol": 195
+            },
+            "vitals": {
+                "heartRate": 116,
+                "bloodPressure": "102/64",
+                "temperature": 99.4,
+                "oxygenSaturation": 88
+            },
+            "medications": [
+                "Heparin",
+                "Rivaroxaban",
+                "Oxygen Therapy"
+            ],
+            "lengthOfStay": 8
+        }
+    ],
+    "metadata": {
+        "totalRecords": 20,
+        "exportDate": "2024-04-30",
+        "version": "2.1.0",
+        "dataSource": "Hospital Management Information System"
+    }
+}
