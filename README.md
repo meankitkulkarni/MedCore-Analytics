@@ -1,30 +1,41 @@
-🏥 MedCore Analytics — Hospital Intelligence Dashboard
+# 🏥 MedCore Analytics — Hospital Intelligence Dashboard
 
-A browser-based, zero-backend hospital analytics dashboard that transforms patient record data into interactive, real-time visualizations.
+> A browser-based, zero-backend hospital analytics dashboard that transforms patient record data into interactive, real-time visualizations.
 
+---
 
-📌 Overview
-MedCore Analytics is a single-page application (SPA) built with vanilla HTML, CSS, and JavaScript. It ingests structured patient records in JSON format and renders a rich analytics dashboard featuring KPI cards, 10+ interactive charts, and a fully searchable, sortable patient registry — all without any server, framework, or database.
+## 📌 Overview
 
-🗂️ Project Structure
+**MedCore Analytics** is a single-page application (SPA) built with vanilla HTML, CSS, and JavaScript. It ingests structured patient records in JSON format and renders a rich analytics dashboard featuring KPI cards, 10+ interactive charts, and a fully searchable, sortable patient registry — all without any server, framework, or database.
+
+---
+
+## 🗂️ Project Structure
+
+```
 Hospital_Data_Analytics/
 ├── index.html        # Full SPA — UI layout, styles, and all JS logic
 ├── app.js            # (reserved / entry point placeholder)
 ├── style.css         # (reserved / additional styles placeholder)
 └── records.json      # Sample dataset — 20 patient records
+```
 
-🧱 Architecture Block Diagram
+---
+
+## 🧱 Architecture Block Diagram
+
+```
 ┌─────────────────────────────────────────────────────────────────┐
 │                        BROWSER (Client-Side SPA)                │
 │                                                                 │
 │  ┌──────────────┐    ┌───────────────────────────────────────┐  │
 │  │  DATA INPUT  │    │           CORE LOGIC (app.js)         │  │
 │  │              │    │                                       │  │
-│  │ ┌──────────┐ │    │  ┌─────────────┐  ┌───────────────┐   │  │
-│  │ │ Upload   │─┼────┼─▶│  filterTable│  │  renderKPIs  │   │  │
-│  │ │ JSON     │ │    │  │  sortTable  │  │  buildCharts  │   │  │
-│  │ └──────────┘ │    │  │  goPage     │  │  updateCharts │   │  │
-│  │              │    │  └──────┬──────┘  └──────┬────────┘   │  │
+│  │ ┌──────────┐ │    │  ┌─────────────┐  ┌───────────────┐  │  │
+│  │ │ Upload   │─┼────┼─▶│  filterTable│  │  renderKPIs   │  │  │
+│  │ │ JSON     │ │    │  │  sortTable  │  │  buildCharts  │  │  │
+│  │ └──────────┘ │    │  │  goPage     │  │  updateCharts │  │  │
+│  │              │    │  └──────┬──────┘  └──────┬────────┘  │  │
 │  │ ┌──────────┐ │    │         │                │            │  │
 │  │ │ Sample   │─┼────┼─────────┴────────────────┘            │  │
 │  │ │ Data     │ │    │                  │                    │  │
@@ -34,68 +45,85 @@ Hospital_Data_Analytics/
 │  ┌──────────────┐    │         └────────┬────────┘           │  │
 │  │   FILTERS    │    │                  │                    │  │
 │  │              │    └──────────────────┼────────────────────┘  │
-│  │ 🔍 Search    │                       │                       │
+│  │ 🔍 Search    │                       │                        │
 │  │ 🏥 Dept.    ├───────────────────────┤                        │
-│  │ ⚠️  Severity │                       │                       │
-│  └──────────────┘                       ▼                       │
+│  │ ⚠️  Severity │                       │                        │
+│  └──────────────┘                       ▼                        │
 │                      ┌─────────────────────────────────────┐    │
 │                      │           RENDER LAYER              │    │
 │                      │                                     │    │
-│          ┌───────────┴──────────┐   ┌─────────────────┐    │    │
+│          ┌───────────┴──────────┐   ┌─────────────────┐   │    │
 │          │    KPI CARDS         │   │  Chart.js v4     │   │    │
 │          │  • Total Patients    │   │  • Bar / Doughnut│   │    │
 │          │  • Avg Length of Stay│   │  • Line / Radar  │   │    │
 │          │  • Total Cost        │   │  • Scatter / Hist│   │    │
-│          │  • Readmission Rate  │   └─────────────────┘    │    │
+│          │  • Readmission Rate  │   └─────────────────┘   │    │
 │          └──────────────────────┘                          │    │
 │                      │                                     │    │
-│          ┌───────────┴──────────┐                          │    │
-│          │   PATIENT TABLE      │                          │    │
-│          │  Search │ Sort │ Page│                          │    │
-│          │  Export │ Delete     │                          │    │
-│          └──────────────────────┘                          │    │
+│          ┌───────────┴──────────┐                         │    │
+│          │   PATIENT TABLE      │                         │    │
+│          │  Search │ Sort │ Page│                         │    │
+│          │  Export │ Delete     │                         │    │
+│          └──────────────────────┘                         │    │
 │                      └─────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────────┘
+```
 
-✨ Features
-📊 KPI Summary Cards
+---
+
+## ✨ Features
+
+### 📊 KPI Summary Cards
 Displays at-a-glance metrics computed from the active dataset:
+- Total Patients
+- Average Length of Stay
+- Total Treatment Cost
+- Insurance Coverage Rate
+- Readmission Rate
+- Severity Breakdown
 
-Total Patients
-Average Length of Stay
-Total Treatment Cost
-Insurance Coverage Rate
-Readmission Rate
-Severity Breakdown
+### 📈 Charts & Visualizations (Powered by Chart.js v4)
 
-📈 Charts & Visualizations (Powered by Chart.js v4)
-SectionChartTypePatient AnalyticsAdmissions by DepartmentBarPatient AnalyticsSeverity DistributionDoughnutFinancial & ClinicalCost vs CoverageGrouped BarFinancial & ClinicalGender DistributionPieFinancial & ClinicalRoom Type UsageDoughnutTrend & DistributionMonthly Admissions TrendLineTrend & DistributionAge Distribution HistogramBarTrend & DistributionLength of Stay by DepartmentBox/BarTrend & DistributionCost vs Length of StayScatterTrend & DistributionReadmission by DepartmentRadar
-🗃️ Patient Records Table
+| Section | Chart | Type |
+|---|---|---|
+| Patient Analytics | Admissions by Department | Bar |
+| Patient Analytics | Severity Distribution | Doughnut |
+| Financial & Clinical | Cost vs Coverage | Grouped Bar |
+| Financial & Clinical | Gender Distribution | Pie |
+| Financial & Clinical | Room Type Usage | Doughnut |
+| Trend & Distribution | Monthly Admissions Trend | Line |
+| Trend & Distribution | Age Distribution Histogram | Bar |
+| Trend & Distribution | Length of Stay by Department | Box/Bar |
+| Trend & Distribution | Cost vs Length of Stay | Scatter |
+| Trend & Distribution | Readmission by Department | Radar |
 
-Full-text search across patient name and ID
-Sort by any column (ID, Name, Age, Department, Severity, Cost, LOS)
-Pagination with configurable rows-per-page
-Per-row delete functionality
-Export filtered results as JSON
+### 🗃️ Patient Records Table
+- Full-text **search** across patient name and ID
+- **Sort** by any column (ID, Name, Age, Department, Severity, Cost, LOS)
+- **Pagination** with configurable rows-per-page
+- Per-row **delete** functionality
+- **Export** filtered results as JSON
 
-🎛️ Filters
+### 🎛️ Filters
+- Filter by **Department** (Cardiology, Neurology, Oncology, etc.)
+- Filter by **Severity** (Critical, High, Medium, Low)
+- All charts and KPIs update reactively on filter change
 
-Filter by Department (Cardiology, Neurology, Oncology, etc.)
-Filter by Severity (Critical, High, Medium, Low)
-All charts and KPIs update reactively on filter change
+### 🔧 Data Management
+- **Upload** a custom `.json` dataset
+- **Load sample data** (built-in 20 patient demo dataset)
+- **Clear all data** to reset the dashboard
+- Live **clock display**
+- **Toast notifications** for user actions
 
-🔧 Data Management
+---
 
-Upload a custom .json dataset
-Load sample data (built-in 20 patient demo dataset)
-Clear all data to reset the dashboard
-Live clock display
-Toast notifications for user actions
+## 📦 Data Schema
 
-
-📦 Data Schema
 The dashboard expects a JSON file in the following format:
-json{
+
+```json
+{
   "hospital": {
     "name": "MedCore General Hospital",
     "location": "New York, NY",
@@ -145,42 +173,66 @@ json{
     }
   ]
 }
+```
 
-🚀 Getting Started
+---
+
+## 🚀 Getting Started
+
 No installation or build step required.
-bash# Clone or download the project
+
+```bash
+# Clone or download the project
 git clone https://github.com/your-username/hospital-data-analytics.git
 cd hospital-data-analytics
 
 # Open directly in browser
 open index.html
-Or simply double-click index.html to launch in your default browser.
+```
 
-Tip: For the best experience, use a modern browser (Chrome, Firefox, Edge).
+Or simply double-click `index.html` to launch in your default browser.
 
+> **Tip:** For the best experience, use a modern browser (Chrome, Firefox, Edge).
 
-🛠️ Tech Stack
-TechnologyPurposeHTML5 / CSS3Layout and stylingVanilla JavaScript (ES6+)All data logic and interactivityChart.js v4.4.1Chart renderingGoogle Fonts (DM Sans, DM Serif, JetBrains Mono)TypographyJSONData format
-No frameworks. No build tools. No backend. No dependencies to install.
+---
 
-🎨 Design
+## 🛠️ Tech Stack
 
-Dark-themed UI (#080c14 base) with blue/teal accent palette
-Glassmorphism card styling with backdrop-filter
-Smooth CSS animations on load (animate-in)
-Fully responsive layout (grid adapts to screen size)
-Color-coded severity levels: Critical (red), High (orange), Medium (yellow), Low (green)
+| Technology | Purpose |
+|---|---|
+| HTML5 / CSS3 | Layout and styling |
+| Vanilla JavaScript (ES6+) | All data logic and interactivity |
+| [Chart.js v4.4.1](https://www.chartjs.org/) | Chart rendering |
+| Google Fonts (DM Sans, DM Serif, JetBrains Mono) | Typography |
+| JSON | Data format |
 
+**No frameworks. No build tools. No backend. No dependencies to install.**
 
-📁 Sample Dataset
-records.json ships with 20 anonymized patient records from MedCore General Hospital (demo data), spanning departments including Cardiology, Neurology, Oncology, Orthopedics, and Pediatrics.
+---
 
-🔮 Future Improvements
+## 🎨 Design
 
- Add date-range filter for admissions
- Support CSV import in addition to JSON
- Add print / PDF export for reports
- Persist data across sessions using localStorage
- Expand dataset with 100+ synthetic records
+- Dark-themed UI (`#080c14` base) with blue/teal accent palette
+- Glassmorphism card styling with `backdrop-filter`
+- Smooth CSS animations on load (`animate-in`)
+- Fully responsive layout (grid adapts to screen size)
+- Color-coded severity levels: Critical (red), High (orange), Medium (yellow), Low (green)
 
-Built with ❤️ for healthcare data transparency by Ankit Kulkarni.
+---
+
+## 📁 Sample Dataset
+
+`records.json` ships with **20 anonymized patient records** from MedCore General Hospital (demo data), spanning departments including Cardiology, Neurology, Oncology, Orthopedics, and Pediatrics.
+
+---
+
+## 🔮 Future Improvements
+
+- [ ] Add date-range filter for admissions
+- [ ] Support CSV import in addition to JSON
+- [ ] Add print / PDF export for reports
+- [ ] Persist data across sessions using localStorage
+- [ ] Expand dataset with 100+ synthetic records
+---
+
+*Built with ❤️ for healthcare data transparency.*
